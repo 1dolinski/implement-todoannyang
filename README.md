@@ -17,6 +17,9 @@ To get the application up and running.
 ```
 node server.js
 ```
-
+3. Go to
+```
+http://localhost:8000/index.html
+```
 #### Tips
 I used [bower](http://bower.io/) to install angular and annnyang. It is important that the bower_components remain in the static folder and not in the root directory because express.static "sandboxes" to the path you pass. This means that it won't go a "level up" from the directory. 
