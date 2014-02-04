@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en" ng-app="ToDo">
+<head>
+  <meta charset="UTF-8">
+  <title>todo</title>
+  <style>
+    .done { 
+      text-decoration: line-through;
+      color: #ccc;
+    }
+  </style>
+</head>
+<body>
+  <div ng-controller="todoController">
+    <form name="frm" ng-submit="addTodo()">
+      <input type="text" name="newtodo" ng-model="newTodo" required />
+      <button ng-disabled="frm.$invalid">Go</button>
+    </form>
+    <button ng-click="clearCompleted()">Clear Completed</button>
+    <ul>
+      <li ng-repeat="todo in todos track by $index">
+        <input type="checkbox" ng-model="todo.done" />{{$index+1}}
+        <span ng-class="{'done':todo.done}">{{todo.title}}</span>
+      </li>
+    </ul>
+  </div>
+  <script src="./bower_components/annyang/annyang.js"></script>
+  <script src="./bower_components/angular/angular.min.js"></script>
+  <script>
+  angular.module('ToDo',[]).
+  controller('todoController',['$scope',function($scope){
+    $scope.todos = JSON.parse(localStorage.getItem('todos')) || []
+
+    /*
+    $scope.todos = [
+      {'title':'Build a todo app', 'done':false}
+      ];
+    */
+
+    $scope.addTodo = function(){
+      $scope.todos.push({'title':$scope.newTodo,'done':false})
+      $scope.newTodo = ''
+    }
+    $scope.clearCompleted = function(){
+      $scope.todos = $scope.todos.filter(function(item){
+        return !item.done
+      })
+    }
+
+    $scope.$watch('todos', function(newValue, oldValue){
+      if(newValue != oldValue ){
+        localStorage.setItem('todos', JSON.stringify(newValue))
+      }
+    },true)
+
+    var commands = {
+      'new item *val' : function(val){
+        $scope.newTodo = val;
+        $scope.addTodo();
+        $scope.$apply();
+      },
+      'check number *val' : function(val){
+        $scope.todos[parseInt(val)-1].done = true;
+        $scope.$apply();
+      },
+      'remove number *val':function(val){
+        $scope.todos.splice(parseInt(val)-1,1);
+        $scope.apply();
+      },
+      'clear completed':function(){
+        $scope.clearCompleted();
+        $scope.apply();
+      }
+    }
+
+    annyang.addCommands(commands);
+    annyang.debug();
+    annyang.start();
+
+    }])
+</script>
+</body>
+</html>
